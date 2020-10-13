@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -17,12 +18,17 @@ import javafx.scene.layout.RowConstraints;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.ResourceBundle;
 
 public class MazeController implements Initializable {
 
-    private final static int CELL_SIZE = 36;
     private final static int INITIAL_MAZE_SIZE = 7;
+    private final static int MIN_MAZE_SIZE = 3;
+    private final static int MAX_MAZE_SIZE = 10;
+    private final static int GRID_PANE_ACTUAL_SIZE = 360;
+    private final static int CELL_SIZE = GRID_PANE_ACTUAL_SIZE / MAX_MAZE_SIZE;
+
     @FXML
     public ChoiceBox<Integer> heightChoiceBox;
     @FXML
@@ -41,8 +47,14 @@ public class MazeController implements Initializable {
     public Label statusLabel;
     @FXML
     public GridPane mazePane;
-    private boolean isStartSet = false;
-    private boolean isEndSet = false;
+    private final Image pathImage = new Image(getClass().getResourceAsStream("path.png"));
+    private final Image wallImage = new Image(getClass().getResourceAsStream("wall.png"));
+    private final Image startImage = new Image(getClass().getResourceAsStream("start.png"));
+    private final Image endImage = new Image(getClass().getResourceAsStream("end.png"));
+    private boolean settingStart = false;
+    private boolean settingEnd = false;
+    private ImageView startPoint;
+    private ImageView endPoint;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -68,7 +80,7 @@ public class MazeController implements Initializable {
      */
     private ObservableList<Integer> getSizeOptionsList() {
         List<Integer> options = new ArrayList<>();
-        for (int i = 3; i <= 10; i++) {
+        for (int i = MIN_MAZE_SIZE; i <= MAX_MAZE_SIZE; i++) {
             options.add(i);
         }
         return FXCollections.observableArrayList(options);
@@ -78,7 +90,16 @@ public class MazeController implements Initializable {
      * Checks both start and end points are set, disabling "Solve" button if false.
      */
     private void checkStartEndSet() {
-        solveButton.setDisable(!(isStartSet && isEndSet));
+        solveButton.setDisable(
+                startPoint == null || endPoint == null || startPoint == endPoint
+                        || checkNotOnField(startPoint) || checkNotOnField(endPoint)
+                        || !startPoint.getImage().equals(startImage)
+                        || !endPoint.getImage().equals(endImage)
+        );
+    }
+
+    private boolean checkNotOnField(Node node) {
+        return GridPane.getRowIndex(node) >= mazePane.getRowCount() || GridPane.getColumnIndex(node) >= mazePane.getColumnCount();
     }
 
     private void setMazeHeight(int height) {
@@ -94,6 +115,13 @@ public class MazeController implements Initializable {
             }
             currentHeight = mazePane.getRowCount();
         }
+
+        if (startPoint != null && checkNotOnField(startPoint))
+            startPoint = null;
+        if (endPoint != null && checkNotOnField(endPoint))
+            endPoint = null;
+
+        checkStartEndSet();
     }
 
     private void setMazeWidth(int width) {
@@ -109,6 +137,13 @@ public class MazeController implements Initializable {
             }
             currentWidth = mazePane.getColumnCount();
         }
+
+        if (startPoint != null && checkNotOnField(startPoint))
+            startPoint = null;
+        if (endPoint != null && checkNotOnField(endPoint))
+            endPoint = null;
+
+        checkStartEndSet();
     }
 
     private void addMazeRow() {
@@ -132,19 +167,33 @@ public class MazeController implements Initializable {
     }
 
     private ImageView prepareMazeCell() {
-        Image pathImage = new Image(getClass().getResourceAsStream("path.png"));
-        Image wallImage = new Image(getClass().getResourceAsStream("wall.png"));
-
         ImageView view = new ImageView();
         view.setImage(pathImage);
         view.setFitHeight(CELL_SIZE);
         view.setFitWidth(CELL_SIZE);
 
         view.setOnMouseClicked(mouseEvent -> {
-            if (view.getImage().equals(pathImage))
+            if (settingStart || settingEnd) {
+                if (settingStart && view != endPoint) {
+                    if (startPoint != null)
+                        startPoint.setImage(pathImage);
+                    view.setImage(startImage);
+                    startPoint = view;
+                    settingStart = false;
+                } else if (settingEnd && view != startPoint) {
+                    if (endPoint != null)
+                        endPoint.setImage(pathImage);
+                    view.setImage(endImage);
+                    endPoint = view;
+                    settingEnd = false;
+                }
+            } else if (view.getImage().equals(pathImage)) {
                 view.setImage(wallImage);
-            else
+            } else {
                 view.setImage(pathImage);
+            }
+            checkStartEndSet();
+
         });
         return view;
     }
@@ -177,22 +226,31 @@ public class MazeController implements Initializable {
     }
 
     public void onStartSet() {
-        isStartSet = true;
-        checkStartEndSet();
+        settingStart = true;
     }
 
     public void onEndSet() {
-        isEndSet = true;
-        checkStartEndSet();
+        settingEnd = true;
     }
 
     public void onRandom() {
     }
 
     public void onReset() {
-        isStartSet = false;
-        isEndSet = false;
+        startPoint = null;
+        endPoint = null;
         checkStartEndSet();
+
+        setMazeHeight(INITIAL_MAZE_SIZE);
+        setMazeWidth(INITIAL_MAZE_SIZE);
+
+        mazePane.getChildren().forEach(node -> {
+            if (node instanceof ImageView)
+                ((ImageView) node).setImage(pathImage);
+        });
+
+        heightChoiceBox.setValue(INITIAL_MAZE_SIZE);
+        widthChoiceBox.setValue(INITIAL_MAZE_SIZE);
     }
 
     public void onSolve(ActionEvent actionEvent) {
