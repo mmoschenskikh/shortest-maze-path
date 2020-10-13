@@ -55,6 +55,9 @@ public class MazeController implements Initializable {
         heightChoiceBox.setValue(mazePane.getRowCount());
         widthChoiceBox.setValue(mazePane.getColumnCount());
 
+        heightChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> setMazeHeight(heightChoiceBox.getValue()));
+        widthChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> setMazeWidth(widthChoiceBox.getValue()));
+
         checkStartEndSet();
     }
 
@@ -78,38 +81,98 @@ public class MazeController implements Initializable {
         solveButton.setDisable(!(isStartSet && isEndSet));
     }
 
-    private void initializeMaze() {
-        RowConstraints rowConstraints = new RowConstraints();
-        rowConstraints.setPrefHeight(CELL_SIZE);
-        ColumnConstraints columnConstraints = new ColumnConstraints();
-        columnConstraints.setPrefWidth(CELL_SIZE);
-
-        mazePane.getRowConstraints().add(rowConstraints);
-        mazePane.getColumnConstraints().add(columnConstraints);
-
-        for (int i = 0; i < INITIAL_MAZE_SIZE; i++) {
-            mazePane.addColumn(i);
-            mazePane.addRow(i);
+    private void setMazeHeight(int height) {
+        int currentHeight = mazePane.getRowCount();
+        while (height != currentHeight) {
+            if (height > currentHeight) {
+                addMazeRow();
+            } else {
+                final int removeIndex = currentHeight - 1;
+                mazePane.getChildren().removeIf(
+                        node -> GridPane.getRowIndex(node) == null || GridPane.getRowIndex(node) == removeIndex
+                );
+            }
+            currentHeight = mazePane.getRowCount();
         }
+    }
 
+    private void setMazeWidth(int width) {
+        int currentWidth = mazePane.getColumnCount();
+        while (width != currentWidth) {
+            if (width > currentWidth) {
+                addMazeColumn();
+            } else {
+                final int removeIndex = currentWidth - 1;
+                mazePane.getChildren().removeIf(
+                        node -> GridPane.getColumnIndex(node) == null || GridPane.getColumnIndex(node) == removeIndex
+                );
+            }
+            currentWidth = mazePane.getColumnCount();
+        }
+    }
+
+    private void addMazeRow() {
+        int index = mazePane.getRowCount();
+        mazePane.addRow(index);
+
+        for (int i = 0; i < mazePane.getColumnCount(); i++) {
+            ImageView cellView = prepareMazeCell();
+            mazePane.add(cellView, i, index);
+        }
+    }
+
+    private void addMazeColumn() {
+        int index = mazePane.getColumnCount();
+        mazePane.addColumn(index);
+
+        for (int i = 0; i < mazePane.getRowCount(); i++) {
+            ImageView cellView = prepareMazeCell();
+            mazePane.add(cellView, index, i);
+        }
+    }
+
+    private ImageView prepareMazeCell() {
         Image pathImage = new Image(getClass().getResourceAsStream("path.png"));
         Image wallImage = new Image(getClass().getResourceAsStream("wall.png"));
 
-        for (int i = 0; i < INITIAL_MAZE_SIZE; i++) {
-            for (int j = 0; j < INITIAL_MAZE_SIZE; j++) {
-                ImageView view = new ImageView();
-                view.setImage(pathImage);
-                view.setFitHeight(CELL_SIZE);
-                view.setFitWidth(CELL_SIZE);
+        ImageView view = new ImageView();
+        view.setImage(pathImage);
+        view.setFitHeight(CELL_SIZE);
+        view.setFitWidth(CELL_SIZE);
 
-                view.setOnMouseClicked(mouseEvent -> {
-                    if (view.getImage().equals(pathImage))
-                        view.setImage(wallImage);
-                    else
-                        view.setImage(pathImage);
-                });
-                mazePane.add(view, i, j);
-            }
+        view.setOnMouseClicked(mouseEvent -> {
+            if (view.getImage().equals(pathImage))
+                view.setImage(wallImage);
+            else
+                view.setImage(pathImage);
+        });
+        return view;
+    }
+
+    private void setGridPaneConstraints(int cellSize) {
+        RowConstraints rowConstraints = new RowConstraints();
+        rowConstraints.setPrefHeight(cellSize);
+
+        ColumnConstraints columnConstraints = new ColumnConstraints();
+        columnConstraints.setPrefWidth(cellSize);
+
+        mazePane.getRowConstraints().add(rowConstraints);
+        mazePane.getColumnConstraints().add(columnConstraints);
+    }
+
+    private void initializeMaze() {
+        setGridPaneConstraints(CELL_SIZE);
+
+        ImageView cellView = prepareMazeCell();
+
+        mazePane.addColumn(0);
+        mazePane.addRow(0);
+        mazePane.add(cellView, 0, 0);
+
+        int i = 0;
+        while (++i < INITIAL_MAZE_SIZE) {
+            addMazeRow();
+            addMazeColumn();
         }
     }
 
