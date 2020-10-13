@@ -234,6 +234,47 @@ public class MazeController implements Initializable {
     }
 
     public void onRandom() {
+        onReset();
+        Random random = new Random();
+
+        int height = Math.max(random.nextInt(MAX_MAZE_SIZE), MIN_MAZE_SIZE);
+        int width = Math.max(random.nextInt(MAX_MAZE_SIZE), MIN_MAZE_SIZE);
+
+        heightChoiceBox.setValue(height);
+        widthChoiceBox.setValue(width);
+
+        int startRow = random.nextInt(height - 1);
+        int startColumn = random.nextInt(width - 1);
+
+        int endRow = random.nextInt(height - 1);
+        int endColumn = random.nextInt(width - 1);
+
+        while (startRow == endRow && startColumn == endColumn) {
+            endRow = random.nextInt(height - 1);
+            endColumn = random.nextInt(width - 1);
+        }
+
+        mazePane.getChildren().forEach(node -> {
+            if (node instanceof ImageView) {
+                ImageView view = (ImageView) node;
+                if (random.nextBoolean())
+                    view.setImage(wallImage);
+            }
+        });
+
+        startPoint = (ImageView) mazePane.getChildren().filtered(node ->
+                GridPane.getRowIndex(node) == startRow && GridPane.getColumnIndex(node) == startColumn
+        ).get(0);
+        startPoint.setImage(startImage);
+
+        int finalEndRow = endRow;
+        int finalEndColumn = endColumn;
+        endPoint = (ImageView) mazePane.getChildren().filtered(node ->
+                GridPane.getRowIndex(node) == finalEndRow && GridPane.getColumnIndex(node) == finalEndColumn
+        ).get(0);
+        endPoint.setImage(endImage);
+
+        checkStartEndSet();
     }
 
     public void onReset() {
