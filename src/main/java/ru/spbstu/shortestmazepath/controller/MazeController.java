@@ -275,14 +275,16 @@ public class MazeController implements Initializable {
         });
 
         startPoint = (ImageView) mazePane.getChildren().filtered(node ->
-                GridPane.getRowIndex(node) == startRow && GridPane.getColumnIndex(node) == startColumn
+                GridPane.getRowIndex(node) != null && GridPane.getColumnIndex(node) != null
+                        && GridPane.getRowIndex(node) == startRow && GridPane.getColumnIndex(node) == startColumn
         ).get(0);
         startPoint.setImage(startImage);
 
         int finalEndRow = endRow;
         int finalEndColumn = endColumn;
         endPoint = (ImageView) mazePane.getChildren().filtered(node ->
-                GridPane.getRowIndex(node) == finalEndRow && GridPane.getColumnIndex(node) == finalEndColumn
+                GridPane.getRowIndex(node) != null && GridPane.getColumnIndex(node) != null
+                        && GridPane.getRowIndex(node) == finalEndRow && GridPane.getColumnIndex(node) == finalEndColumn
         ).get(0);
         endPoint.setImage(endImage);
 
