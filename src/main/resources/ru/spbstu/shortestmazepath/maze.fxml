@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
+<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import java.lang.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1">
+            minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1"
+            fx:controller="ru.spbstu.shortestmazepath.controller.MazeController">
     <right>
         <GridPane BorderPane.alignment="CENTER">
             <columnConstraints>
@@ -27,7 +29,22 @@
                     </GridPane.margin>
                     <children>
                         <Label text="Height"/>
-                        <ChoiceBox fx:id="heightChoiceBox" prefWidth="150.0"/>
+                        <ChoiceBox fx:id="heightChoiceBox" prefWidth="150.0">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <Integer fx:value="3"/>
+                                    <Integer fx:value="4"/>
+                                    <Integer fx:value="5"/>
+                                    <Integer fx:value="6"/>
+                                    <Integer fx:value="7"/>
+                                    <Integer fx:value="8"/>
+                                    <Integer fx:value="9"/>
+                                    <Integer fx:value="10"/>
+                                    <Integer fx:value="11"/>
+                                    <Integer fx:value="12"/>
+                                </FXCollections>
+                            </items>
+                        </ChoiceBox>
                     </children>
                 </VBox>
                 <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1">
@@ -37,7 +54,20 @@
                                 <Insets/>
                             </VBox.margin>
                         </Label>
-                        <ChoiceBox fx:id="widthChoiceBox" prefWidth="150.0"/>
+                        <ChoiceBox fx:id="widthChoiceBox" prefWidth="150.0">
+                            <FXCollections fx:factory="observableArrayList">
+                                <Integer fx:value="3"/>
+                                <Integer fx:value="4"/>
+                                <Integer fx:value="5"/>
+                                <Integer fx:value="6"/>
+                                <Integer fx:value="7"/>
+                                <Integer fx:value="8"/>
+                                <Integer fx:value="9"/>
+                                <Integer fx:value="10"/>
+                                <Integer fx:value="11"/>
+                                <Integer fx:value="12"/>
+                            </FXCollections>
+                        </ChoiceBox>
                     </children>
                     <GridPane.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
@@ -51,9 +81,10 @@
                         <Insets/>
                     </opaqueInsets>
                     <children>
-                        <Button fx:id="startPointButton" mnemonicParsing="false" prefWidth="95.0"
+                        <Button fx:id="startPointButton" mnemonicParsing="false" onAction="#onStartSet" prefWidth="95.0"
                                 text="Set Start Point"/>
-                        <Button fx:id="endPointButton" mnemonicParsing="false" prefWidth="95.0" text="Set End Point">
+                        <Button fx:id="endPointButton" mnemonicParsing="false" onAction="#onEndSet" prefWidth="95.0"
+                                text="Set End Point">
                             <VBox.margin>
                                 <Insets top="5.0"/>
                             </VBox.margin>
@@ -65,8 +96,10 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </GridPane.margin>
                     <children>
-                        <Button fx:id="randomButton" mnemonicParsing="false" prefWidth="95.0" text="Randomize"/>
-                        <Button fx:id="resetButton" mnemonicParsing="false" prefWidth="95.0" text="Reset Maze">
+                        <Button fx:id="randomButton" mnemonicParsing="false" onAction="#onRandom" prefWidth="95.0"
+                                text="Randomize"/>
+                        <Button fx:id="resetButton" mnemonicParsing="false" onAction="#onReset" prefWidth="95.0"
+                                text="Reset Maze">
                             <VBox.margin>
                                 <Insets top="5.0"/>
                             </VBox.margin>
@@ -78,33 +111,18 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </GridPane.margin>
                     <children>
-                        <Button fx:id="solveButton" mnemonicParsing="false" prefWidth="95.0" text="Solve"/>
+                        <Button fx:id="solveButton" mnemonicParsing="false" onAction="#onSolve" prefWidth="95.0"
+                                text="Solve"/>
                     </children>
                 </VBox>
             </children>
         </GridPane>
     </right>
     <center>
-        <GridPane BorderPane.alignment="CENTER">
-            <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-            </rowConstraints>
+        <GridPane fx:id="mazePane" alignment="CENTER" gridLinesVisible="true" maxHeight="360.0" maxWidth="360.0"
+                  minHeight="90.0" minWidth="90.0" BorderPane.alignment="CENTER">
             <BorderPane.margin>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                <Insets bottom="6.0" left="17.0" right="17.0" top="17.0"/>
             </BorderPane.margin>
         </GridPane>
     </center>

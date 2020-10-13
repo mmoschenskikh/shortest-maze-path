@@ -22,7 +22,7 @@ public class MazeApp extends Application {
 
         stage.setScene(scene);
         stage.setTitle(TITLE);
-        stage.setResizable(false); // ????
+        stage.setResizable(false);
 
         stage.show();
     }
