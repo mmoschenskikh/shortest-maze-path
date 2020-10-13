@@ -25,7 +25,7 @@ public class MazeController implements Initializable {
 
     private final static int INITIAL_MAZE_SIZE = 7;
     private final static int MIN_MAZE_SIZE = 3;
-    private final static int MAX_MAZE_SIZE = 10;
+    private final static int MAX_MAZE_SIZE = 12;
     private final static int GRID_PANE_ACTUAL_SIZE = 360;
     private final static int CELL_SIZE = GRID_PANE_ACTUAL_SIZE / MAX_MAZE_SIZE;
 
@@ -67,8 +67,14 @@ public class MazeController implements Initializable {
         heightChoiceBox.setValue(mazePane.getRowCount());
         widthChoiceBox.setValue(mazePane.getColumnCount());
 
-        heightChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> setMazeHeight(heightChoiceBox.getValue()));
-        widthChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> setMazeWidth(widthChoiceBox.getValue()));
+        heightChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> {
+            setMazeHeight(heightChoiceBox.getValue());
+            statusLabel.setText("Constructing the maze...");
+        });
+        widthChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> {
+            setMazeWidth(widthChoiceBox.getValue());
+            statusLabel.setText("Constructing the maze...");
+        });
 
         checkStartEndSet();
     }
@@ -180,20 +186,24 @@ public class MazeController implements Initializable {
                     view.setImage(startImage);
                     startPoint = view;
                     settingStart = false;
+                    statusLabel.setText("The start point is set");
                 } else if (settingEnd && view != startPoint) {
                     if (endPoint != null)
                         endPoint.setImage(pathImage);
                     view.setImage(endImage);
                     endPoint = view;
                     settingEnd = false;
+                    statusLabel.setText("The end point is set");
                 }
-            } else if (view.getImage().equals(pathImage)) {
-                view.setImage(wallImage);
             } else {
-                view.setImage(pathImage);
+                statusLabel.setText("Constructing the maze...");
+                if (view.getImage().equals(pathImage)) {
+                    view.setImage(wallImage);
+                } else {
+                    view.setImage(pathImage);
+                }
             }
             checkStartEndSet();
-
         });
         return view;
     }
@@ -226,10 +236,12 @@ public class MazeController implements Initializable {
     }
 
     public void onStartSet() {
+        statusLabel.setText("Choose a cell for the start point...");
         settingStart = true;
     }
 
     public void onEndSet() {
+        statusLabel.setText("Choose a cell for the end point...");
         settingEnd = true;
     }
 
@@ -274,6 +286,7 @@ public class MazeController implements Initializable {
         ).get(0);
         endPoint.setImage(endImage);
 
+        statusLabel.setText("Random Maze generated");
         checkStartEndSet();
     }
 
@@ -292,8 +305,11 @@ public class MazeController implements Initializable {
 
         heightChoiceBox.setValue(INITIAL_MAZE_SIZE);
         widthChoiceBox.setValue(INITIAL_MAZE_SIZE);
+
+        statusLabel.setText("Successfully reset");
     }
 
     public void onSolve(ActionEvent actionEvent) {
+        statusLabel.setText("Cannot solve it now :((");
     }
 }
