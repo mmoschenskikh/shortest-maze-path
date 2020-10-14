@@ -129,7 +129,7 @@
     <bottom>
         <StackPane BorderPane.alignment="CENTER">
             <children>
-                <Label fx:id="statusLabel" text="Welcome to Maze Solver" StackPane.alignment="CENTER_LEFT"/>
+                <Label fx:id="statusLabel" StackPane.alignment="CENTER_LEFT"/>
             </children>
             <BorderPane.margin>
                 <Insets left="5.0" right="5.0"/>

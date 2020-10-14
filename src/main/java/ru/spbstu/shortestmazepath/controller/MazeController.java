@@ -12,7 +12,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import ru.spbstu.shortestmazepath.util.StringsSupplier;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -42,38 +44,82 @@ public class MazeController implements Initializable {
     public Label statusLabel;
     @FXML
     public GridPane mazePane;
+
+    private boolean mazeChanged = false;
+    private boolean settingStart = false;
+    private boolean settingEnd = false;
+
     private final Image pathImage = new Image(getClass().getResourceAsStream("path.png"));
     private final Image wallImage = new Image(getClass().getResourceAsStream("wall.png"));
     private final Image startImage = new Image(getClass().getResourceAsStream("start.png"));
     private final Image endImage = new Image(getClass().getResourceAsStream("end.png"));
-    private boolean settingStart = false;
-    private boolean settingEnd = false;
+
     private ImageView startPoint;
     private ImageView endPoint;
 
-    private boolean changed = false;
+    private ResourceBundle strings;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        try {
+            strings = StringsSupplier.getStrings();
+        } catch (IOException e) {
+            throw new IllegalStateException("Missing 'strings' file!");
+        }
+
         ObservableList<Integer> options = getSizeOptionsList();
         heightChoiceBox.setItems(options);
         widthChoiceBox.setItems(options);
 
         initializeMaze();
+        statusLabel.setText(strings.getString("greeting"));
 
         heightChoiceBox.setValue(mazePane.getRowCount());
         widthChoiceBox.setValue(mazePane.getColumnCount());
 
         heightChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> {
             setMazeHeight(heightChoiceBox.getValue());
-            statusLabel.setText("Constructing the maze...");
+            statusLabel.setText(strings.getString("constructing"));
         });
         widthChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> {
             setMazeWidth(widthChoiceBox.getValue());
-            statusLabel.setText("Constructing the maze...");
+            statusLabel.setText(strings.getString("constructing"));
         });
 
         checkStartEndSet();
+    }
+
+    private void initializeMaze() {
+        setGridPaneConstraints(CELL_SIZE);
+
+        ImageView cellView = prepareMazeCell();
+
+        mazePane.addColumn(0);
+        mazePane.addRow(0);
+        mazePane.add(cellView, 0, 0);
+
+        int i = 0;
+        while (++i < INITIAL_MAZE_SIZE) {
+            addMazeRow();
+            addMazeColumn();
+        }
+    }
+
+
+    /**
+     * Sets proper sizes for GridPane rows and columns, making cells square.
+     *
+     * @param cellSize the size of the square cell side.
+     */
+    private void setGridPaneConstraints(int cellSize) {
+        RowConstraints rowConstraints = new RowConstraints();
+        rowConstraints.setPrefHeight(cellSize);
+
+        ColumnConstraints columnConstraints = new ColumnConstraints();
+        columnConstraints.setPrefWidth(cellSize);
+
+        mazePane.getRowConstraints().add(rowConstraints);
+        mazePane.getColumnConstraints().add(columnConstraints);
     }
 
     /**
@@ -108,7 +154,7 @@ public class MazeController implements Initializable {
     private void setMazeHeight(int height) {
         int currentHeight = mazePane.getRowCount();
         while (height != currentHeight) {
-            changed = true;
+            mazeChanged = true;
             if (height > currentHeight) {
                 addMazeRow();
             } else {
@@ -131,7 +177,7 @@ public class MazeController implements Initializable {
     private void setMazeWidth(int width) {
         int currentWidth = mazePane.getColumnCount();
         while (width != currentWidth) {
-            changed = true;
+            mazeChanged = true;
             if (width > currentWidth) {
                 addMazeColumn();
             } else {
@@ -178,7 +224,7 @@ public class MazeController implements Initializable {
         view.setFitWidth(CELL_SIZE);
 
         view.setOnMouseClicked(mouseEvent -> {
-            changed = true;
+            mazeChanged = true;
             if (settingStart || settingEnd) {
                 if (settingStart && view != endPoint) {
                     if (startPoint != null)
@@ -186,17 +232,17 @@ public class MazeController implements Initializable {
                     view.setImage(startImage);
                     startPoint = view;
                     settingStart = false;
-                    statusLabel.setText("The start point is set");
+                    statusLabel.setText(strings.getString("startSet"));
                 } else if (settingEnd && view != startPoint) {
                     if (endPoint != null)
                         endPoint.setImage(pathImage);
                     view.setImage(endImage);
                     endPoint = view;
                     settingEnd = false;
-                    statusLabel.setText("The end point is set");
+                    statusLabel.setText(strings.getString("endSet"));
                 }
             } else {
-                statusLabel.setText("Constructing the maze...");
+                statusLabel.setText(strings.getString("constructing"));
                 if (view.getImage().equals(pathImage)) {
                     view.setImage(wallImage);
                 } else {
@@ -208,40 +254,17 @@ public class MazeController implements Initializable {
         return view;
     }
 
-    private void setGridPaneConstraints(int cellSize) {
-        RowConstraints rowConstraints = new RowConstraints();
-        rowConstraints.setPrefHeight(cellSize);
 
-        ColumnConstraints columnConstraints = new ColumnConstraints();
-        columnConstraints.setPrefWidth(cellSize);
 
-        mazePane.getRowConstraints().add(rowConstraints);
-        mazePane.getColumnConstraints().add(columnConstraints);
-    }
 
-    private void initializeMaze() {
-        setGridPaneConstraints(CELL_SIZE);
-
-        ImageView cellView = prepareMazeCell();
-
-        mazePane.addColumn(0);
-        mazePane.addRow(0);
-        mazePane.add(cellView, 0, 0);
-
-        int i = 0;
-        while (++i < INITIAL_MAZE_SIZE) {
-            addMazeRow();
-            addMazeColumn();
-        }
-    }
 
     public void onStartSet() {
-        statusLabel.setText("Choose a cell for the start point...");
+        statusLabel.setText(strings.getString("chooseStart"));
         settingStart = true;
     }
 
     public void onEndSet() {
-        statusLabel.setText("Choose a cell for the end point...");
+        statusLabel.setText(strings.getString("chooseEnd"));
         settingEnd = true;
     }
 
@@ -288,16 +311,16 @@ public class MazeController implements Initializable {
         ).get(0);
         endPoint.setImage(endImage);
 
-        statusLabel.setText("Random Maze generated");
+        statusLabel.setText(strings.getString("randomOk"));
         checkStartEndSet();
     }
 
     public void onReset() {
-        if (changed) {
+        if (mazeChanged) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Reset Maze");
+            alert.setTitle(strings.getString("resetTitle"));
             alert.setHeaderText(null);
-            alert.setContentText("All progress will be lost. Do you want to continue?");
+            alert.setContentText(strings.getString("resetMessage"));
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK)
@@ -321,11 +344,11 @@ public class MazeController implements Initializable {
         heightChoiceBox.setValue(INITIAL_MAZE_SIZE);
         widthChoiceBox.setValue(INITIAL_MAZE_SIZE);
 
-        changed = false;
-        statusLabel.setText("Successfully reset");
+        mazeChanged = false;
+        statusLabel.setText(strings.getString("resetOk"));
     }
 
     public void onSolve(ActionEvent actionEvent) {
-        statusLabel.setText("Cannot solve it now :((");
+        statusLabel.setText(strings.getString("solver"));
     }
 }

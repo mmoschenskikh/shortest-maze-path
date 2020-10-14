@@ -4,12 +4,13 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import ru.spbstu.shortestmazepath.util.StringsSupplier;
 
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 public class MazeApp extends Application {
 
-    public final static String TITLE = "Maze Solver";
 
     public static void main(String[] args) {
         launch();
@@ -17,11 +18,13 @@ public class MazeApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        ResourceBundle strings = StringsSupplier.getStrings();
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("maze.fxml"));
         Scene scene = new Scene(loader.load());
 
         stage.setScene(scene);
-        stage.setTitle(TITLE);
+        stage.setTitle(strings.getString("title"));
         stage.setResizable(false);
 
         stage.show();

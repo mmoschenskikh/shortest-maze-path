@@ -1,0 +1,13 @@
+title=Maze Solver
+greeting=Welcome to Maze Solver
+constructing=Constructing the maze...
+startSet=The start point is set
+endSet=The end point is set
+chooseStart=Choose a cell for the start point...
+chooseEnd=Choose a cell for the end point...
+randomOk=Random Maze generated
+resetTitle=Reset Maze
+resetMessage=All progress will be lost. Do you want to continue?
+resetOk=Successfully reset
+
+solver=Cannot solve it now :((
