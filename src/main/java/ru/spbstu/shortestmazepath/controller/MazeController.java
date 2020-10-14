@@ -22,8 +22,8 @@ public class MazeController implements Initializable {
 
     private final static int INITIAL_MAZE_SIZE = 7;
     private final static int MIN_MAZE_SIZE = 3;
-    private final static int MAX_MAZE_SIZE = 12;
-    private final static int GRID_PANE_ACTUAL_SIZE = 360;
+    private final static int MAX_MAZE_SIZE = 16;
+    private final static int GRID_PANE_ACTUAL_SIZE = 610;
     private final static int CELL_SIZE = GRID_PANE_ACTUAL_SIZE / MAX_MAZE_SIZE;
 
     @FXML
