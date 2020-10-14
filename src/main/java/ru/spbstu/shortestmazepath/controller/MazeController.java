@@ -6,9 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -16,10 +14,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MazeController implements Initializable {
 
@@ -55,6 +50,8 @@ public class MazeController implements Initializable {
     private boolean settingEnd = false;
     private ImageView startPoint;
     private ImageView endPoint;
+
+    private boolean changed = false;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -111,6 +108,7 @@ public class MazeController implements Initializable {
     private void setMazeHeight(int height) {
         int currentHeight = mazePane.getRowCount();
         while (height != currentHeight) {
+            changed = true;
             if (height > currentHeight) {
                 addMazeRow();
             } else {
@@ -133,6 +131,7 @@ public class MazeController implements Initializable {
     private void setMazeWidth(int width) {
         int currentWidth = mazePane.getColumnCount();
         while (width != currentWidth) {
+            changed = true;
             if (width > currentWidth) {
                 addMazeColumn();
             } else {
@@ -179,6 +178,7 @@ public class MazeController implements Initializable {
         view.setFitWidth(CELL_SIZE);
 
         view.setOnMouseClicked(mouseEvent -> {
+            changed = true;
             if (settingStart || settingEnd) {
                 if (settingStart && view != endPoint) {
                     if (startPoint != null)
@@ -246,7 +246,7 @@ public class MazeController implements Initializable {
     }
 
     public void onRandom() {
-        onReset();
+        resetMaze();
         Random random = new Random();
 
         int height = Math.max(random.nextInt(MAX_MAZE_SIZE), MIN_MAZE_SIZE);
@@ -293,6 +293,19 @@ public class MazeController implements Initializable {
     }
 
     public void onReset() {
+        if (changed) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Reset Maze");
+            alert.setHeaderText(null);
+            alert.setContentText("All progress will be lost. Do you want to continue?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK)
+                resetMaze();
+        }
+    }
+
+    private void resetMaze() {
         startPoint = null;
         endPoint = null;
         checkStartEndSet();
@@ -308,6 +321,7 @@ public class MazeController implements Initializable {
         heightChoiceBox.setValue(INITIAL_MAZE_SIZE);
         widthChoiceBox.setValue(INITIAL_MAZE_SIZE);
 
+        changed = false;
         statusLabel.setText("Successfully reset");
     }
 
