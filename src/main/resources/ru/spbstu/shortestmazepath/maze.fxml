@@ -6,13 +6,13 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="660.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/11.0.1"
+            minWidth="-Infinity" prefHeight="660.0" prefWidth="920.0" xmlns="http://javafx.com/javafx/11.0.1"
             fx:controller="ru.spbstu.shortestmazepath.controller.MazeController">
     <right>
         <GridPane BorderPane.alignment="CENTER">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="10.0" prefWidth="120.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="10.0" prefWidth="120.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="130.0" minWidth="10.0" prefWidth="130.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="130.0" minWidth="10.0" prefWidth="130.0"/>
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints maxHeight="123.0" minHeight="0.0" prefHeight="50.0" vgrow="NEVER"/>
@@ -82,8 +82,8 @@
                     </opaqueInsets>
                     <children>
                         <Button fx:id="startPointButton" mnemonicParsing="false" onAction="#onStartSet"
-                                prefWidth="110.0" text="Set Start Point"/>
-                        <Button fx:id="endPointButton" mnemonicParsing="false" onAction="#onEndSet" prefWidth="110.0"
+                                prefWidth="120.0" text="Set Start Point"/>
+                        <Button fx:id="endPointButton" mnemonicParsing="false" onAction="#onEndSet" prefWidth="120.0"
                                 text="Set End Point">
                             <VBox.margin>
                                 <Insets top="5.0"/>
@@ -97,9 +97,9 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </GridPane.margin>
                     <children>
-                        <Button fx:id="randomButton" mnemonicParsing="false" onAction="#onRandom" prefWidth="110.0"
+                        <Button fx:id="randomButton" mnemonicParsing="false" onAction="#onRandom" prefWidth="120.0"
                                 text="Randomize"/>
-                        <Button fx:id="resetButton" mnemonicParsing="false" onAction="#onReset" prefWidth="110.0"
+                        <Button fx:id="resetButton" mnemonicParsing="false" onAction="#onReset" prefWidth="120.0"
                                 text="Reset Maze">
                             <VBox.margin>
                                 <Insets top="5.0"/>
@@ -113,8 +113,8 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </GridPane.margin>
                     <children>
-                        <Button fx:id="solveButton" mnemonicParsing="false" onAction="#onSolve" prefWidth="110.0"
-                                text="Solve"/>
+                        <Button fx:id="solveButton" mnemonicParsing="false" onAction="#onSolve" prefWidth="120.0"
+                                text="Solve Maze"/>
                     </children>
                 </VBox>
             </children>
