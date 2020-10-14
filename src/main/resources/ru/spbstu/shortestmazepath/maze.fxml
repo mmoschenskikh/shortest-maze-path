@@ -121,7 +121,7 @@
         </GridPane>
     </right>
     <center>
-        <GridPane fx:id="mazePane" alignment="CENTER" gridLinesVisible="true" BorderPane.alignment="CENTER">
+        <GridPane fx:id="mazePane" alignment="CENTER" BorderPane.alignment="CENTER">
             <BorderPane.margin>
                 <Insets bottom="8.0" left="25.0" right="25.0" top="25.0"/>
             </BorderPane.margin>
