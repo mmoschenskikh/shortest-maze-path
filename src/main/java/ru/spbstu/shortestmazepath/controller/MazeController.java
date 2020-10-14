@@ -285,11 +285,13 @@ public class MazeController implements Initializable {
     public void onStartSet() {
         statusLabel.setText(strings.getString("chooseStart"));
         settingStart = true;
+        settingEnd = false;
     }
 
     public void onEndSet() {
         statusLabel.setText(strings.getString("chooseEnd"));
         settingEnd = true;
+        settingStart = false;
     }
 
     public void onRandom() {
@@ -360,6 +362,8 @@ public class MazeController implements Initializable {
         widthChoiceBox.setValue(INITIAL_MAZE_SIZE);
 
         mazeChanged = false;
+        settingStart = false;
+        settingEnd = false;
         statusLabel.setText(strings.getString("resetOk"));
     }
 
