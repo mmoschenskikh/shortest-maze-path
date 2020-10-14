@@ -89,11 +89,13 @@ public class MazeController implements Initializable {
         checkStartEndSet();
     }
 
+    /**
+     * Generates a maze of initial size.
+     */
     private void initializeMaze() {
         setGridPaneConstraints(CELL_SIZE);
 
         ImageView cellView = prepareMazeCell();
-
         mazePane.addColumn(0);
         mazePane.addRow(0);
         mazePane.add(cellView, 0, 0);
@@ -104,7 +106,6 @@ public class MazeController implements Initializable {
             addMazeColumn();
         }
     }
-
 
     /**
      * Sets proper sizes for GridPane rows and columns, making cells square.
@@ -136,21 +137,58 @@ public class MazeController implements Initializable {
     }
 
     /**
+     * Adds a new row with maze cells to the field.
+     */
+    private void addMazeRow() {
+        int index = mazePane.getRowCount();
+        mazePane.addRow(index);
+
+        for (int i = 0; i < mazePane.getColumnCount(); i++) {
+            ImageView cellView = prepareMazeCell();
+            mazePane.add(cellView, i, index);
+        }
+    }
+
+    /**
+     * Adds a new column with maze cells to the field.
+     */
+    private void addMazeColumn() {
+        int index = mazePane.getColumnCount();
+        mazePane.addColumn(index);
+
+        for (int i = 0; i < mazePane.getRowCount(); i++) {
+            ImageView cellView = prepareMazeCell();
+            mazePane.add(cellView, index, i);
+        }
+    }
+
+    /**
      * Checks both start and end points are set, disabling "Solve" button if false.
      */
     private void checkStartEndSet() {
         solveButton.setDisable(
-                startPoint == null || endPoint == null || startPoint == endPoint
+                startPoint == null || endPoint == null
                         || checkNotOnField(startPoint) || checkNotOnField(endPoint)
-                        || !startPoint.getImage().equals(startImage)
-                        || !endPoint.getImage().equals(endImage)
+                        || !startPoint.getImage().equals(startImage) || !endPoint.getImage().equals(endImage)
         );
     }
 
+    /**
+     * Checks if the node is on the maze field.
+     *
+     * @param node node to check.
+     * @return false if the node is on the field, true otherwise.
+     */
     private boolean checkNotOnField(Node node) {
-        return GridPane.getRowIndex(node) >= mazePane.getRowCount() || GridPane.getColumnIndex(node) >= mazePane.getColumnCount();
+        return GridPane.getRowIndex(node) == null || GridPane.getColumnIndex(node) == null
+                || GridPane.getRowIndex(node) >= mazePane.getRowCount() || GridPane.getColumnIndex(node) >= mazePane.getColumnCount();
     }
 
+    /**
+     * Changes the row count of the maze field.
+     *
+     * @param height the row count to be set.
+     */
     private void setMazeHeight(int height) {
         int currentHeight = mazePane.getRowCount();
         while (height != currentHeight) {
@@ -174,6 +212,11 @@ public class MazeController implements Initializable {
         checkStartEndSet();
     }
 
+    /**
+     * Changes the column count of the maze field.
+     *
+     * @param width the column count to be set.
+     */
     private void setMazeWidth(int width) {
         int currentWidth = mazePane.getColumnCount();
         while (width != currentWidth) {
@@ -197,26 +240,11 @@ public class MazeController implements Initializable {
         checkStartEndSet();
     }
 
-    private void addMazeRow() {
-        int index = mazePane.getRowCount();
-        mazePane.addRow(index);
-
-        for (int i = 0; i < mazePane.getColumnCount(); i++) {
-            ImageView cellView = prepareMazeCell();
-            mazePane.add(cellView, i, index);
-        }
-    }
-
-    private void addMazeColumn() {
-        int index = mazePane.getColumnCount();
-        mazePane.addColumn(index);
-
-        for (int i = 0; i < mazePane.getRowCount(); i++) {
-            ImageView cellView = prepareMazeCell();
-            mazePane.add(cellView, index, i);
-        }
-    }
-
+    /**
+     * Generates an ImageView maze cell.
+     *
+     * @return a new maze cell.
+     */
     private ImageView prepareMazeCell() {
         ImageView view = new ImageView();
         view.setImage(pathImage);
@@ -253,10 +281,6 @@ public class MazeController implements Initializable {
         });
         return view;
     }
-
-
-
-
 
     public void onStartSet() {
         statusLabel.setText(strings.getString("chooseStart"));
@@ -303,6 +327,7 @@ public class MazeController implements Initializable {
         ).get(0);
         startPoint.setImage(startImage);
 
+        // Variables to use inside the following lambda.
         int finalEndRow = endRow;
         int finalEndColumn = endColumn;
         endPoint = (ImageView) mazePane.getChildren().filtered(node ->
@@ -315,19 +340,9 @@ public class MazeController implements Initializable {
         checkStartEndSet();
     }
 
-    public void onReset() {
-        if (mazeChanged) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle(strings.getString("resetTitle"));
-            alert.setHeaderText(null);
-            alert.setContentText(strings.getString("resetMessage"));
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK)
-                resetMaze();
-        }
-    }
-
+    /**
+     * Returns the maze to its initial state.
+     */
     private void resetMaze() {
         startPoint = null;
         endPoint = null;
@@ -346,6 +361,19 @@ public class MazeController implements Initializable {
 
         mazeChanged = false;
         statusLabel.setText(strings.getString("resetOk"));
+    }
+
+    public void onReset() {
+        if (mazeChanged) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle(strings.getString("resetTitle"));
+            alert.setHeaderText(null);
+            alert.setContentText(strings.getString("resetMessage"));
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK)
+                resetMaze();
+        }
     }
 
     public void onSolve(ActionEvent actionEvent) {
