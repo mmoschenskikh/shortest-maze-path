@@ -11,8 +11,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import ru.spbstu.shortestmazepath.model.Cell;
 import ru.spbstu.shortestmazepath.model.Maze;
-import ru.spbstu.shortestmazepath.model.MazeCell;
 import ru.spbstu.shortestmazepath.util.StringsSupplier;
 
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class MazeController implements Initializable {
     @FXML
     public GridPane mazePane;
 
-    private List<Maze.Cell> solution = null;
+    private List<Cell> solution = null;
     private boolean solutionHighlighted = false;
     private boolean mazeChanged = false;
     private boolean settingStart = false;
@@ -436,8 +436,8 @@ public class MazeController implements Initializable {
         }
     }
 
-    private void setSolutionOpacity(List<Maze.Cell> solution, double opacity) {
-        for (Maze.Cell cell : solution) {
+    private void setSolutionOpacity(List<Cell> solution, double opacity) {
+        for (Cell cell : solution) {
             mazePane.getChildren().stream()
                     .filter(node ->
                             GridPane.getColumnIndex(node) == cell.x && GridPane.getRowIndex(node) == cell.y
@@ -451,9 +451,9 @@ public class MazeController implements Initializable {
     private Maze mazeViewToModel() {
         final int height = heightChoiceBox.getValue();
         final int width = widthChoiceBox.getValue();
-        MazeCell[][] mazeCells = new MazeCell[width][height];
-        Maze.Cell startCell = null;
-        Maze.Cell endCell = null;
+        Cell[][] mazeCells = new Cell[width][height];
+        Cell startCell = null;
+        Cell endCell = null;
         for (int i = 0; i < width; i++) {
             int currentColumn = i;
             List<ImageView> column = mazePane.getChildren().stream()
@@ -461,11 +461,15 @@ public class MazeController implements Initializable {
                     .map(node -> (ImageView) node)
                     .collect(Collectors.toList());
             for (int j = 0; j < height; j++) {
-                mazeCells[i][j] = MazeCell.valueOf(Type.identify(column.get(j)).toString());
-                if (mazeCells[i][j] == MazeCell.START)
-                    startCell = new Maze.Cell(i, j);
-                if (mazeCells[i][j] == MazeCell.END)
-                    endCell = new Maze.Cell(i, j);
+                mazeCells[i][j] = new Cell(i, j, Cell.Type.valueOf(Type.identify(column.get(j)).toString()));
+                switch (mazeCells[i][j].type) {
+                    case START:
+                        startCell = mazeCells[i][j];
+                        break;
+                    case END:
+                        endCell = mazeCells[i][j];
+                        break;
+                }
             }
         }
         if (startCell == null || endCell == null)
