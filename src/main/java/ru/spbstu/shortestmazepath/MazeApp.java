@@ -3,7 +3,9 @@ package ru.spbstu.shortestmazepath;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import ru.spbstu.shortestmazepath.controller.MazeController;
 import ru.spbstu.shortestmazepath.util.StringsSupplier;
 
 import java.io.IOException;
@@ -25,6 +27,7 @@ public class MazeApp extends Application {
 
         stage.setScene(scene);
         stage.setTitle(strings.getString("title"));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("icon.png")));
         stage.setResizable(false);
 
         stage.show();
