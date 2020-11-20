@@ -1,5 +1,6 @@
 package ru.spbstu.shortestmazepath.controller;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -434,6 +435,22 @@ public class MazeController implements Initializable {
         } catch (IllegalArgumentException e) {
             statusLabel.setText(strings.getString("noPath"));
         }
+    }
+
+    public void onExit() {
+        if (mazeChanged) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle(strings.getString("exitTitle"));
+            alert.setHeaderText(null);
+            alert.setContentText(strings.getString("resetMessage"));
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isEmpty() || result.get() != ButtonType.OK) {
+                return;
+            }
+        }
+        Platform.exit();
+        System.exit(0);
     }
 
     private void setSolutionOpacity(List<Cell> solution, double opacity) {

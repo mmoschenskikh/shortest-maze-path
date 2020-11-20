@@ -30,6 +30,12 @@ public class MazeApp extends Application {
         stage.getIcons().add(new Image(getClass().getResourceAsStream("icon.png")));
         stage.setResizable(false);
 
+        MazeController mc = loader.getController();
+        stage.setOnCloseRequest(windowEvent -> {
+            mc.onExit();
+            windowEvent.consume();
+        });
+
         stage.show();
     }
 

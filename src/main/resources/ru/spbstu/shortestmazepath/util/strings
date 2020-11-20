@@ -8,6 +8,7 @@ chooseEnd=Choose a cell for the end point...
 randomOk=Random Maze generated
 resetTitle=Reset Maze
 resetMessage=All progress will be lost. Do you want to continue?
+exitTitle=Exit Maze Solver
 resetOk=Successfully reset
 
 solved=Successfully solved in %d ms
