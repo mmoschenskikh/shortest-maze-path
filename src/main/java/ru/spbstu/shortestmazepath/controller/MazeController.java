@@ -423,6 +423,7 @@ public class MazeController implements Initializable {
     }
 
     public void onSolve() {
+        if (solutionHighlighted) return;
         try {
             final long startTime = System.currentTimeMillis();
             solution = mazeViewToModel().solve();
@@ -445,6 +446,7 @@ public class MazeController implements Initializable {
                     .map(node -> (ImageView) node)
                     .collect(Collectors.toList()).forEach(view -> view.setOpacity(opacity));
         }
+        solutionHighlighted = opacity == SOLUTION_OPACITY;
     }
 
     private Maze mazeViewToModel() {
