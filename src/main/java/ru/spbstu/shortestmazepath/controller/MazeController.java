@@ -107,10 +107,14 @@ public class MazeController implements Initializable {
 
         heightChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> {
             setMazeHeight(heightChoiceBox.getValue());
+            if (solutionHighlighted)
+                setSolutionOpacity(solution, 1);
             statusLabel.setText(strings.getString("constructing"));
         });
         widthChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> {
             setMazeWidth(widthChoiceBox.getValue());
+            if (solutionHighlighted)
+                setSolutionOpacity(solution, 1);
             statusLabel.setText(strings.getString("constructing"));
         });
 
@@ -281,6 +285,8 @@ public class MazeController implements Initializable {
 
         view.setOnMouseClicked(mouseEvent -> {
             mazeChanged = true;
+            if (solutionHighlighted)
+                setSolutionOpacity(solution, 1);
             if (settingStart || settingEnd) {
                 if (settingStart && view != endPoint) {
                     if (startPoint != null)
@@ -312,12 +318,16 @@ public class MazeController implements Initializable {
 
     public void onStartSet() {
         statusLabel.setText(strings.getString("chooseStart"));
+        if (solutionHighlighted)
+            setSolutionOpacity(solution, 1);
         settingStart = true;
         settingEnd = false;
     }
 
     public void onEndSet() {
         statusLabel.setText(strings.getString("chooseEnd"));
+        if (solutionHighlighted)
+            setSolutionOpacity(solution, 1);
         settingEnd = true;
         settingStart = false;
     }
