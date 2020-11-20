@@ -53,10 +53,11 @@ public class Maze {
         }
 
         /**
-         * Calculating Manhattan distance between two points.
+         * Calculating Euclidean distance between two cells.
+         * d(c1, c2) = sqrt((c1.x - c2.x) ^ 2 + (c1.y - c2.y) ^ 2)
          *
-         * @param other the second point.
-         * @return Manhattan distance between points.
+         * @param other the second cell.
+         * @return Euclidean distance between cells.
          */
         public double distanceTo(Cell other) {
             int dx = x - other.x;
