@@ -89,15 +89,15 @@ public class Maze {
 
     public List<Cell> solve() throws IllegalArgumentException {
         final int inf = Integer.max(height, width) + 1;
-        Map<Cell, Integer> gScore = new HashMap<>();
-        PriorityQueue<Cell> openSet =
-                new PriorityQueue<>(Comparator.comparingDouble(value -> getHeuristics(value) + gScore.getOrDefault(value, inf)));
-        openSet.add(startCell);
-        Set<Cell> closedSet = new HashSet<>();
+        Map<Cell, Integer> cost = new HashMap<>(); // the cost of the cheapest path from start to a cell
+        PriorityQueue<Cell> toVisit =
+                new PriorityQueue<>(Comparator.comparingDouble(value -> getHeuristics(value) + cost.getOrDefault(value, inf)));
+        toVisit.add(startCell);
+        Set<Cell> visited = new HashSet<>();
         Map<Cell, Cell> cameFrom = new HashMap<>();
-        gScore.put(startCell, 0);
-        while (!openSet.isEmpty()) {
-            Cell current = openSet.poll();
+        cost.put(startCell, 0);
+        while (!toVisit.isEmpty()) {
+            Cell current = toVisit.poll();
             if (current.equals(endCell)) {
                 LinkedList<Cell> path = new LinkedList<>();
                 path.addFirst(current);
@@ -107,15 +107,15 @@ public class Maze {
                 }
                 return path;
             }
-            closedSet.add(current);
+            visited.add(current);
             Set<Cell> ns = getNeighbours(current);
             for (Cell neighbor : ns) {
-                int score = gScore.getOrDefault(current, inf) + 1;
-                if (score < gScore.getOrDefault(neighbor, inf) || !closedSet.contains(neighbor)) {
+                int score = cost.getOrDefault(current, inf) + 1;
+                if (score < cost.getOrDefault(neighbor, inf) || !visited.contains(neighbor)) {
                     cameFrom.put(neighbor, current);
-                    gScore.put(neighbor, score);
-                    if (!openSet.contains(neighbor))
-                        openSet.add(neighbor);
+                    cost.put(neighbor, score);
+                    if (!toVisit.contains(neighbor))
+                        toVisit.add(neighbor);
                 }
 
             }
