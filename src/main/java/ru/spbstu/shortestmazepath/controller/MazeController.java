@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 public class MazeController implements Initializable {
 
+    private final static double SOLUTION_OPACITY = 0.5;
     private final static int INITIAL_MAZE_SIZE = 7;
     private final static int MIN_MAZE_SIZE = 3;
     private final static int MAX_MAZE_SIZE = 16;
@@ -47,6 +48,8 @@ public class MazeController implements Initializable {
     @FXML
     public GridPane mazePane;
 
+    private List<Maze.Cell> solution = null;
+    private boolean solutionHighlighted = false;
     private boolean mazeChanged = false;
     private boolean settingStart = false;
     private boolean settingEnd = false;
@@ -405,8 +408,30 @@ public class MazeController implements Initializable {
         }
     }
 
-    public void onSolve(ActionEvent actionEvent) {
-        statusLabel.setText(strings.getString("solver"));
+    public void onSolve() {
+        try {
+            final long startTime = System.currentTimeMillis();
+            solution = mazeViewToModel().solve();
+            final long endTime = System.currentTimeMillis();
+            final double deltaSec = ((double) endTime - startTime) / 1000;
+            setSolutionOpacity(solution, SOLUTION_OPACITY);
+            solutionHighlighted = true;
+            statusLabel.setText(String.format(strings.getString("solved"), deltaSec));
+        } catch (IllegalArgumentException e) {
+            statusLabel.setText(strings.getString("noPath"));
+        }
+    }
+
+    private void setSolutionOpacity(List<Maze.Cell> solution, double opacity) {
+        for (Maze.Cell cell : solution) {
+            mazePane.getChildren().stream()
+                    .filter(node ->
+                            GridPane.getColumnIndex(node) == cell.x && GridPane.getRowIndex(node) == cell.y
+                                    && node instanceof ImageView && !node.equals(startPoint) && !node.equals(endPoint)
+                    )
+                    .map(node -> (ImageView) node)
+                    .collect(Collectors.toList()).forEach(view -> view.setOpacity(opacity));
+        }
     }
 
     private Maze mazeViewToModel() {
