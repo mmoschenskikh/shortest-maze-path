@@ -305,11 +305,15 @@ public class MazeController implements Initializable {
                 }
             } else {
                 statusLabel.setText(strings.getString("constructing"));
-                if (Type.identify(view) == Type.PATH) {
+                Type identify = Type.identify(view);
+                if (identify == Type.START)
+                    startPoint = null;
+                if (identify == Type.END)
+                    endPoint = null;
+                if (identify == Type.PATH)
                     view.setImage(Type.WALL.image);
-                } else {
+                else
                     view.setImage(Type.PATH.image);
-                }
             }
             checkStartEndSet();
         });
