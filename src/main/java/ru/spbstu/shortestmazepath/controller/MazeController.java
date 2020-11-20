@@ -2,7 +2,6 @@ package ru.spbstu.shortestmazepath.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -49,10 +48,33 @@ public class MazeController implements Initializable {
     private boolean settingStart = false;
     private boolean settingEnd = false;
 
-    private final Image pathImage = new Image(getClass().getResourceAsStream("path.png"));
-    private final Image wallImage = new Image(getClass().getResourceAsStream("wall.png"));
-    private final Image startImage = new Image(getClass().getResourceAsStream("start.png"));
-    private final Image endImage = new Image(getClass().getResourceAsStream("end.png"));
+    /**
+     * Describes a type of image used in maze.
+     */
+    private enum Type {
+        PATH(new Image(Type.class.getResourceAsStream("path.png"))),
+        WALL(new Image(Type.class.getResourceAsStream("wall.png"))),
+        START(new Image(Type.class.getResourceAsStream("start.png"))),
+        END(new Image(Type.class.getResourceAsStream("end.png")));
+
+        private final Image image;
+
+        Type(Image image) {
+            this.image = image;
+        }
+
+        private static Type identify(ImageView view) {
+            final Image img = view.getImage();
+            if (img.equals(PATH.image))
+                return PATH;
+            else if (img.equals(WALL.image))
+                return WALL;
+            else if (img.equals(START.image))
+                return START;
+            else
+                return END;
+        }
+    }
 
     private ImageView startPoint;
     private ImageView endPoint;
@@ -169,7 +191,7 @@ public class MazeController implements Initializable {
         solveButton.setDisable(
                 startPoint == null || endPoint == null
                         || checkNotOnField(startPoint) || checkNotOnField(endPoint)
-                        || !startPoint.getImage().equals(startImage) || !endPoint.getImage().equals(endImage)
+                        || Type.identify(startPoint) != (Type.START) || Type.identify(endPoint) != (Type.END)
         );
     }
 
@@ -247,7 +269,7 @@ public class MazeController implements Initializable {
      */
     private ImageView prepareMazeCell() {
         ImageView view = new ImageView();
-        view.setImage(pathImage);
+        view.setImage(Type.PATH.image);
         view.setFitHeight(CELL_SIZE);
         view.setFitWidth(CELL_SIZE);
 
@@ -256,25 +278,25 @@ public class MazeController implements Initializable {
             if (settingStart || settingEnd) {
                 if (settingStart && view != endPoint) {
                     if (startPoint != null)
-                        startPoint.setImage(pathImage);
-                    view.setImage(startImage);
+                        startPoint.setImage(Type.PATH.image);
+                    view.setImage(Type.START.image);
                     startPoint = view;
                     settingStart = false;
                     statusLabel.setText(strings.getString("startSet"));
                 } else if (settingEnd && view != startPoint) {
                     if (endPoint != null)
-                        endPoint.setImage(pathImage);
-                    view.setImage(endImage);
+                        endPoint.setImage(Type.PATH.image);
+                    view.setImage(Type.END.image);
                     endPoint = view;
                     settingEnd = false;
                     statusLabel.setText(strings.getString("endSet"));
                 }
             } else {
                 statusLabel.setText(strings.getString("constructing"));
-                if (view.getImage().equals(pathImage)) {
-                    view.setImage(wallImage);
+                if (Type.identify(view) == Type.PATH) {
+                    view.setImage(Type.WALL.image);
                 } else {
-                    view.setImage(pathImage);
+                    view.setImage(Type.PATH.image);
                 }
             }
             checkStartEndSet();
@@ -319,7 +341,7 @@ public class MazeController implements Initializable {
             if (node instanceof ImageView) {
                 ImageView view = (ImageView) node;
                 if (random.nextBoolean())
-                    view.setImage(wallImage);
+                    view.setImage(Type.WALL.image);
             }
         });
 
@@ -327,7 +349,7 @@ public class MazeController implements Initializable {
                 GridPane.getRowIndex(node) != null && GridPane.getColumnIndex(node) != null
                         && GridPane.getRowIndex(node) == startRow && GridPane.getColumnIndex(node) == startColumn
         ).get(0);
-        startPoint.setImage(startImage);
+        startPoint.setImage(Type.START.image);
 
         // Variables to use inside the following lambda.
         int finalEndRow = endRow;
@@ -336,7 +358,7 @@ public class MazeController implements Initializable {
                 GridPane.getRowIndex(node) != null && GridPane.getColumnIndex(node) != null
                         && GridPane.getRowIndex(node) == finalEndRow && GridPane.getColumnIndex(node) == finalEndColumn
         ).get(0);
-        endPoint.setImage(endImage);
+        endPoint.setImage(Type.END.image);
 
         statusLabel.setText(strings.getString("randomOk"));
         checkStartEndSet();
@@ -355,7 +377,7 @@ public class MazeController implements Initializable {
 
         mazePane.getChildren().forEach(node -> {
             if (node instanceof ImageView)
-                ((ImageView) node).setImage(pathImage);
+                ((ImageView) node).setImage(Type.PATH.image);
         });
 
         heightChoiceBox.setValue(INITIAL_MAZE_SIZE);
