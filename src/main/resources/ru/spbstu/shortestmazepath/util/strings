@@ -10,5 +10,5 @@ resetTitle=Reset Maze
 resetMessage=All progress will be lost. Do you want to continue?
 resetOk=Successfully reset
 
-solved=Successfully solved in %.3f s
+solved=Successfully solved in %d ms
 noPath=No path found in the Maze

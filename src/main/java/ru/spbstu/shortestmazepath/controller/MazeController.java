@@ -427,10 +427,9 @@ public class MazeController implements Initializable {
             final long startTime = System.currentTimeMillis();
             solution = mazeViewToModel().solve();
             final long endTime = System.currentTimeMillis();
-            final double deltaSec = ((double) endTime - startTime) / 1000;
             setSolutionOpacity(solution, SOLUTION_OPACITY);
             solutionHighlighted = true;
-            statusLabel.setText(String.format(strings.getString("solved"), deltaSec));
+            statusLabel.setText(String.format(strings.getString("solved"), endTime - startTime));
         } catch (IllegalArgumentException e) {
             statusLabel.setText(strings.getString("noPath"));
         }
