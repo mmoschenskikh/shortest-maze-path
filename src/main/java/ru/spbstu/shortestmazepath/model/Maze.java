@@ -1,8 +1,6 @@
 package ru.spbstu.shortestmazepath.model;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Maze {
 
@@ -89,6 +87,38 @@ public class Maze {
     }
 
     public List<Cell> solve() throws IllegalArgumentException {
+        final int inf = Integer.max(height, width) + 1;
+        Map<Cell, Integer> gScore = new HashMap<>();
+        PriorityQueue<Cell> openSet =
+                new PriorityQueue<>(Comparator.comparingDouble(value -> getHeuristics(value) + gScore.getOrDefault(value, inf)));
+        openSet.add(startCell);
+        Set<Cell> closedSet = new HashSet<>();
+        Map<Cell, Cell> cameFrom = new HashMap<>();
+        gScore.put(startCell, 0);
+        while (!openSet.isEmpty()) {
+            Cell current = openSet.poll();
+            if (current.equals(endCell)) {
+                LinkedList<Cell> path = new LinkedList<>();
+                path.addFirst(current);
+                while (cameFrom.containsKey(current)) {
+                    current = cameFrom.get(current);
+                    path.addFirst(current);
+                }
+                return path;
+            }
+            closedSet.add(current);
+            Set<Cell> ns = getNeighbours(current);
+            for (Cell neighbor : ns) {
+                int score = gScore.getOrDefault(current, inf) + 1;
+                if (score < gScore.getOrDefault(neighbor, inf) || !closedSet.contains(neighbor)) {
+                    cameFrom.put(neighbor, current);
+                    gScore.put(neighbor, score);
+                    if (!openSet.contains(neighbor))
+                        openSet.add(neighbor);
+                }
+
+            }
+        }
         throw new IllegalArgumentException("No path between start and end point exists!");
     }
 
