@@ -412,17 +412,25 @@ public class MazeController implements Initializable {
     private Maze mazeViewToModel() {
         final int height = heightChoiceBox.getValue();
         final int width = widthChoiceBox.getValue();
-        MazeCell[][] mazeCells = new MazeCell[height][width];
-        for (int i = 0; i < height; i++) {
-            int currentRow = i;
-            List<ImageView> row = mazePane.getChildren().stream()
-                    .filter(node -> GridPane.getRowIndex(node) == currentRow && node instanceof ImageView)
+        MazeCell[][] mazeCells = new MazeCell[width][height];
+        Maze.Cell startCell = null;
+        Maze.Cell endCell = null;
+        for (int i = 0; i < width; i++) {
+            int currentColumn = i;
+            List<ImageView> column = mazePane.getChildren().stream()
+                    .filter(node -> GridPane.getColumnIndex(node) == currentColumn && node instanceof ImageView)
                     .map(node -> (ImageView) node)
                     .collect(Collectors.toList());
-            for (int j = 0; j < width; j++) {
-                mazeCells[i][j] = MazeCell.valueOf(Type.identify(row.get(j)).toString());
+            for (int j = 0; j < height; j++) {
+                mazeCells[i][j] = MazeCell.valueOf(Type.identify(column.get(j)).toString());
+                if (mazeCells[i][j] == MazeCell.START)
+                    startCell = new Maze.Cell(i, j);
+                if (mazeCells[i][j] == MazeCell.END)
+                    endCell = new Maze.Cell(i, j);
             }
         }
-        return new Maze(height, width, mazeCells);
+        if (startCell == null || endCell == null)
+            throw new IllegalArgumentException("Both start and end points must be set!");
+        return new Maze(height, width, startCell, endCell, mazeCells);
     }
 }
