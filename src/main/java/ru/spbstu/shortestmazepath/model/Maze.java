@@ -1,7 +1,8 @@
 package ru.spbstu.shortestmazepath.model;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Maze {
 
@@ -66,8 +67,29 @@ public class Maze {
         }
     }
 
-    public List<Cell> solve() {
-        return new ArrayList<>();
+    public Set<Cell> getNeighbours(Cell cell) {
+        Set<Cell> set = new HashSet<>();
+        if (cell.x - 1 >= 0 && mazeGrid[cell.x - 1][cell.y] != MazeCell.WALL) { // Left neighbour
+            set.add(new Cell(cell.x - 1, cell.y));
+        }
+        if (cell.x + 1 < width && mazeGrid[cell.x + 1][cell.y] != MazeCell.WALL) { // Right neighbour
+            set.add(new Cell(cell.x + 1, cell.y));
+        }
+        if (cell.y - 1 >= 0 && mazeGrid[cell.x][cell.y - 1] != MazeCell.WALL) { // Down neighbour
+            set.add(new Cell(cell.x, cell.y - 1));
+        }
+        if (cell.y + 1 < height && mazeGrid[cell.x][cell.y + 1] != MazeCell.WALL) { // Up neighbour
+            set.add(new Cell(cell.x, cell.y + 1));
+        }
+        return set;
+    }
+
+    public double getHeuristics(Cell cell) {
+        return cell.distanceTo(endCell);
+    }
+
+    public List<Cell> solve() throws IllegalArgumentException {
+        throw new IllegalArgumentException("No path between start and end point exists!");
     }
 
     @Override
