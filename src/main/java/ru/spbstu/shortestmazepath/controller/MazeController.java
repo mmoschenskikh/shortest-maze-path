@@ -11,11 +11,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import ru.spbstu.shortestmazepath.model.Maze;
+import ru.spbstu.shortestmazepath.model.MazeCell;
 import ru.spbstu.shortestmazepath.util.StringsSupplier;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MazeController implements Initializable {
 
@@ -404,5 +407,22 @@ public class MazeController implements Initializable {
 
     public void onSolve(ActionEvent actionEvent) {
         statusLabel.setText(strings.getString("solver"));
+    }
+
+    private Maze mazeViewToModel() {
+        final int height = heightChoiceBox.getValue();
+        final int width = widthChoiceBox.getValue();
+        MazeCell[][] mazeCells = new MazeCell[height][width];
+        for (int i = 0; i < height; i++) {
+            int currentRow = i;
+            List<ImageView> row = mazePane.getChildren().stream()
+                    .filter(node -> GridPane.getRowIndex(node) == currentRow && node instanceof ImageView)
+                    .map(node -> (ImageView) node)
+                    .collect(Collectors.toList());
+            for (int j = 0; j < width; j++) {
+                mazeCells[i][j] = MazeCell.valueOf(Type.identify(row.get(j)).toString());
+            }
+        }
+        return new Maze(height, width, mazeCells);
     }
 }
