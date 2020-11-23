@@ -43,13 +43,13 @@ public class MazeManager {
         Cell[][] maze = new Cell[width][height];
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                Cell.Type t;
                 char current;
                 try {
                     current = lines.get(i).charAt(j);
                 } catch (IndexOutOfBoundsException e) {
                     throw new IllegalArgumentException("Maze does not match the specified size");
                 }
+                Cell.Type t;
                 switch (current) {
                     case 'S':
                         t = Cell.Type.START;

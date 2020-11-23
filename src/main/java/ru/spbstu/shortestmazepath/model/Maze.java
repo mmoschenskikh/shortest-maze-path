@@ -10,6 +10,16 @@ public class Maze {
     private final Cell endCell;
     private final Cell[][] mazeGrid;
 
+    public Maze(int height, int width, Cell startCell, Cell endCell, Cell[][] mazeGrid) {
+        this.height = height;
+        this.width = width;
+        this.startCell = startCell;
+        this.endCell = endCell;
+        if (mazeGrid.length != width || mazeGrid[0].length != height)
+            throw new IllegalArgumentException("Wrong height or width passed!");
+        this.mazeGrid = mazeGrid;
+    }
+
     public int getHeight() {
         return height;
     }
@@ -20,16 +30,6 @@ public class Maze {
 
     public Cell[][] getMazeGrid() {
         return mazeGrid;
-    }
-
-    public Maze(int height, int width, Cell startCell, Cell endCell, Cell[][] mazeGrid) {
-        this.height = height;
-        this.width = width;
-        this.startCell = startCell;
-        this.endCell = endCell;
-        if (mazeGrid.length != width || mazeGrid[0].length != height)
-            throw new IllegalArgumentException("Wrong height or width passed!");
-        this.mazeGrid = mazeGrid;
     }
 
     public Set<Cell> getNeighbours(Cell cell) {
