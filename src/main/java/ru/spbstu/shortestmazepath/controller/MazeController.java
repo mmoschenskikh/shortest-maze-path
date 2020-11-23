@@ -458,11 +458,8 @@ public class MazeController implements Initializable {
             try {
                 loadMaze(file);
                 mazeChanged = false;
-            } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle(strings.getString("error"));
-                alert.setHeaderText(null);
-                alert.setContentText(e.getMessage());
+            } catch (IOException | IllegalArgumentException e) {
+                showErrorMessage(e.getMessage());
             }
         }
     }
@@ -476,12 +473,17 @@ public class MazeController implements Initializable {
                 mazeChanged = false;
                 statusLabel.setText(strings.getString("saveOk"));
             } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle(strings.getString("error"));
-                alert.setHeaderText(null);
-                alert.setContentText(e.getMessage());
+                showErrorMessage(e.getMessage());
             }
         }
+    }
+
+    private void showErrorMessage(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(strings.getString("error"));
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.show();
     }
 
     private FileChooser prepareFileChooser() {
