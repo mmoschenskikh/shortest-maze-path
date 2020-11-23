@@ -1,5 +1,8 @@
 package ru.spbstu.shortestmazepath.model;
 
+/**
+ * Represents a maze cell.
+ */
 public class Cell {
     public final int x;
     public final int y;

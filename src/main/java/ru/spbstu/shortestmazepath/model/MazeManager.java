@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A helper class to load/save mazes from/to the filesystem.
+ */
 public class MazeManager {
 
     private static final int MIN_SIZE = MazeController.MIN_MAZE_SIZE;

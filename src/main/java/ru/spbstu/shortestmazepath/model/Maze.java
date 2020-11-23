@@ -32,6 +32,12 @@ public class Maze {
         return mazeGrid;
     }
 
+    /**
+     * Finds all the neighbours of the specified cell.
+     *
+     * @param cell a cell to find neighbours of.
+     * @return a list of neighbour cells.
+     */
     public Set<Cell> getNeighbours(Cell cell) {
         Set<Cell> set = new HashSet<>();
         if (cell.x - 1 >= 0 && mazeGrid[cell.x - 1][cell.y].type != Cell.Type.WALL) { // Left neighbour
@@ -49,10 +55,22 @@ public class Maze {
         return set;
     }
 
+    /**
+     * Computes the estimated cost of the cheapest path from the cell to the goal.
+     *
+     * @param cell a cell to estimate the cost.
+     * @return estimated distance to the goal.
+     */
     public double getHeuristics(Cell cell) {
         return cell.distanceTo(endCell);
     }
 
+    /**
+     * Finds the shortest path from the start point to the end point using the A* algorithm.
+     *
+     * @return a list containing all the cells included in the path.
+     * @throws IllegalArgumentException if the shortest path cannot be found.
+     */
     public List<Cell> solve() throws IllegalArgumentException {
         if (startCell == null || endCell == null)
             throw new IllegalArgumentException("Both start and end points must be set!");
