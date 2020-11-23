@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class MazeController implements Initializable {
@@ -412,9 +413,27 @@ public class MazeController implements Initializable {
     }
 
     public void onReset() {
+        showResetConfirmation(strings.getString("resetTitle"), then -> resetMaze());
+    }
+
+    public void onExit() {
+        showResetConfirmation(
+                strings.getString("exitTitle"),
+                then -> {
+                    Platform.exit();
+                    System.exit(0);
+                });
+    }
+
+    /**
+     * Shows reset confirmation window, performs an action if user pressed "OK".
+     *
+     * @param ifAgreed action to be performed.
+     */
+    private void showResetConfirmation(String title, Consumer<?> ifAgreed) {
         if (mazeChanged) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle(strings.getString("resetTitle"));
+            alert.setTitle(title);
             alert.setHeaderText(null);
             alert.setContentText(strings.getString("resetMessage"));
 
@@ -423,7 +442,20 @@ public class MazeController implements Initializable {
                 return;
             }
         }
-        resetMaze();
+        ifAgreed.accept(null);
+    }
+
+    /**
+     * Shows an error message window with a specified message.
+     *
+     * @param message a message to be shown.
+     */
+    private void showErrorMessage(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(strings.getString("error"));
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.show();
     }
 
     public void onSolve() {
@@ -444,23 +476,17 @@ public class MazeController implements Initializable {
         Stage stage = (Stage) mazePane.getScene().getWindow();
         File file = prepareFileChooser().showOpenDialog(stage);
         if (file != null) {
-            if (mazeChanged) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle(strings.getString("resetTitle"));
-                alert.setHeaderText(null);
-                alert.setContentText(strings.getString("resetMessage"));
-
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.isEmpty() || result.get() != ButtonType.OK) {
-                    return;
-                }
-            }
-            try {
-                loadMaze(file);
-                mazeChanged = false;
-            } catch (IOException | IllegalArgumentException e) {
-                showErrorMessage(e.getMessage());
-            }
+            showResetConfirmation(
+                    strings.getString("resetTitle"),
+                    then -> {
+                        try {
+                            loadMaze(file);
+                            mazeChanged = false;
+                            statusLabel.setText(strings.getString("loadOk"));
+                        } catch (IOException | IllegalArgumentException e) {
+                            showErrorMessage(e.getMessage());
+                        }
+                    });
         }
     }
 
