@@ -18,13 +18,13 @@ public class Cell {
         public String toString() {
             switch (this) {
                 case PATH:
-                    return " ";
+                    return ".";
                 case WALL:
                     return "#";
                 case START:
                     return "S";
                 case END:
-                    return "F";
+                    return "E";
                 default:
                     throw new IllegalStateException("Unexpected value: " + this);
             }

@@ -86,7 +86,7 @@ public class Maze {
             sb.append("*");
             for (int j = 0; j < width; j++) {
                 sb.append(' ');
-                sb.append(mazeGrid[i][j]);
+                sb.append(mazeGrid[j][i]);
             }
             sb.append(" *\n");
         }
