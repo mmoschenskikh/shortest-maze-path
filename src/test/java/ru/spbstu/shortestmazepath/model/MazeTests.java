@@ -2,9 +2,11 @@ package ru.spbstu.shortestmazepath.model;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static ru.spbstu.shortestmazepath.util.TestUtils.assertApproxEquals;
 
 public class MazeTests {
@@ -56,5 +58,24 @@ public class MazeTests {
 
         assertApproxEquals(c1.distanceTo(maze.getEndCell()), maze.getHeuristics(c1), 1e-7);
         assertApproxEquals(c2.distanceTo(maze.getEndCell()), maze.getHeuristics(c2), 1e-7);
+    }
+
+    @Test
+    public void simpleSolveTest() {
+        Cell[][] cells = new Cell[2][2];
+        cells[0][0] = new Cell(0, 0, Cell.Type.START);
+        cells[1][0] = new Cell(1, 0, Cell.Type.END);
+        cells[0][1] = new Cell(0, 1, Cell.Type.PATH);
+        cells[1][1] = new Cell(1, 1, Cell.Type.PATH);
+        Maze maze1 = new Maze(2, 2, cells[0][0], cells[1][0], cells);
+        assertEquals(2, maze1.solve().size());
+        assertIterableEquals(Arrays.asList(cells[0][0], cells[1][0]), maze1.solve());
+
+        cells[1][0] = new Cell(1, 0, Cell.Type.PATH);
+        cells[1][1] = new Cell(1, 1, Cell.Type.END);
+        Maze maze2 = new Maze(2, 2, cells[0][0], cells[1][1], cells);
+        assertEquals(3, maze2.solve().size());
+        // (0, 1) because it firstly checks the right neighbour
+        assertIterableEquals(Arrays.asList(cells[0][0], cells[0][1], cells[1][1]), maze2.solve());
     }
 }
