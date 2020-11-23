@@ -33,6 +33,14 @@ public class Maze {
         return width;
     }
 
+    public Cell getStartCell() {
+        return startCell;
+    }
+
+    public Cell getEndCell() {
+        return endCell;
+    }
+
     public Cell[][] getMazeGrid() {
         return mazeGrid;
     }
