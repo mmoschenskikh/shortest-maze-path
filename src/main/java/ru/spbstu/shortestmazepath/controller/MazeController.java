@@ -23,10 +23,11 @@ import java.util.stream.Collectors;
 
 public class MazeController implements Initializable {
 
+    public final static int MIN_MAZE_SIZE = 3;
+    public final static int MAX_MAZE_SIZE = 16;
+
     private final static double SOLUTION_OPACITY = 0.5;
     private final static int INITIAL_MAZE_SIZE = 7;
-    private final static int MIN_MAZE_SIZE = 3;
-    private final static int MAX_MAZE_SIZE = 16;
     private final static int GRID_PANE_ACTUAL_SIZE = 610;
     private final static int CELL_SIZE = GRID_PANE_ACTUAL_SIZE / MAX_MAZE_SIZE;
 
@@ -418,9 +419,11 @@ public class MazeController implements Initializable {
             alert.setContentText(strings.getString("resetMessage"));
 
             Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK)
-                resetMaze();
+            if (result.isEmpty() || result.get() != ButtonType.OK) {
+                return;
+            }
         }
+        resetMaze();
     }
 
     public void onSolve() {
@@ -480,18 +483,13 @@ public class MazeController implements Initializable {
                     .collect(Collectors.toList());
             for (int j = 0; j < height; j++) {
                 mazeCells[i][j] = new Cell(i, j, Cell.Type.valueOf(Type.identify(column.get(j)).toString()));
-                switch (mazeCells[i][j].type) {
-                    case START:
-                        startCell = mazeCells[i][j];
-                        break;
-                    case END:
-                        endCell = mazeCells[i][j];
-                        break;
+                if (mazeCells[i][j].type == Cell.Type.START) {
+                    startCell = mazeCells[i][j];
+                } else if (mazeCells[i][j].type == Cell.Type.END) {
+                    endCell = mazeCells[i][j];
                 }
             }
         }
-        if (startCell == null || endCell == null)
-            throw new IllegalArgumentException("Both start and end points must be set!");
         return new Maze(height, width, startCell, endCell, mazeCells);
     }
 }

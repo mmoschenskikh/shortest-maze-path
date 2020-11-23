@@ -54,6 +54,8 @@ public class Maze {
     }
 
     public List<Cell> solve() throws IllegalArgumentException {
+        if (startCell == null || endCell == null)
+            throw new IllegalArgumentException("Both start and end points must be set!");
         final int inf = Integer.max(height, width) + 1;
         Map<Cell, Integer> cost = new HashMap<>(); // the cost of the cheapest path from start to a cell
         PriorityQueue<Cell> toVisit =
