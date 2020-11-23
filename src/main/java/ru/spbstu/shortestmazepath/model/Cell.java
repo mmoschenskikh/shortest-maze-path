@@ -42,13 +42,15 @@ public class Cell {
         Cell cell = (Cell) o;
 
         if (x != cell.x) return false;
-        return y == cell.y;
+        if (y != cell.y) return false;
+        return type == cell.type;
     }
 
     @Override
     public int hashCode() {
         int result = x;
         result = 31 * result + y;
+        result = 31 * result + type.hashCode();
         return result;
     }
 
