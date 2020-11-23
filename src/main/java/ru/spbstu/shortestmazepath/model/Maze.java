@@ -10,6 +10,18 @@ public class Maze {
     private final Cell endCell;
     private final Cell[][] mazeGrid;
 
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public Cell[][] getMazeGrid() {
+        return mazeGrid;
+    }
+
     public Maze(int height, int width, Cell startCell, Cell endCell, Cell[][] mazeGrid) {
         this.height = height;
         this.width = width;

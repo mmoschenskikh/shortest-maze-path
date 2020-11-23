@@ -10,6 +10,9 @@ resetTitle=Reset Maze
 resetMessage=All progress will be lost. Do you want to continue?
 exitTitle=Exit Maze Solver
 resetOk=Successfully reset
+error=An error occurred
+loadOk=Maze successfully loaded
+saveOk=Maze successfully saved
 
 solved=Successfully solved in %d ms
 noPath=No path found in the Maze
