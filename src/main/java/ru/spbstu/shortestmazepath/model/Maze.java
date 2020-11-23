@@ -1,8 +1,13 @@
 package ru.spbstu.shortestmazepath.model;
 
+import ru.spbstu.shortestmazepath.controller.MazeController;
+
 import java.util.*;
 
 public class Maze {
+
+    private static final int MIN_SIZE = MazeController.MIN_MAZE_SIZE;
+    private static final int MAX_SIZE = MazeController.MAX_MAZE_SIZE;
 
     private final int height;
     private final int width;
@@ -107,6 +112,40 @@ public class Maze {
             }
         }
         throw new IllegalArgumentException("No path between start and end point exists!");
+    }
+
+    /**
+     * Creates a random maze.
+     *
+     * @return randomly generated maze.
+     */
+    public static Maze random() {
+        Random random = new Random();
+        int height = Math.max(random.nextInt(MAX_SIZE), MIN_SIZE);
+        int width = Math.max(random.nextInt(MAX_SIZE), MIN_SIZE);
+
+        Cell start = new Cell(random.nextInt(width), random.nextInt(height), Cell.Type.START);
+
+        int endX = random.nextInt(width);
+        while (endX == start.x)
+            endX = random.nextInt(width);
+
+        Cell end = new Cell(endX, random.nextInt(height), Cell.Type.END);
+
+        Cell[][] grid = new Cell[width][height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                Cell.Type type;
+                if (start.x == i && start.y == j)
+                    type = Cell.Type.START;
+                else if (end.x == i && end.y == j)
+                    type = Cell.Type.END;
+                else
+                    type = (random.nextBoolean()) ? Cell.Type.WALL : Cell.Type.PATH;
+                grid[i][j] = new Cell(i, j, type);
+            }
+        }
+        return new Maze(height, width, start, end, grid);
     }
 
     @Override

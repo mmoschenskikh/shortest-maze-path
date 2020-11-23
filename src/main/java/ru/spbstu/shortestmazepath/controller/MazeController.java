@@ -22,7 +22,10 @@ import ru.spbstu.shortestmazepath.util.StringsSupplier;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -339,51 +342,8 @@ public class MazeController implements Initializable {
     }
 
     public void onRandom() {
-        resetMaze();
-        Random random = new Random();
-
-        int height = Math.max(random.nextInt(MAX_MAZE_SIZE), MIN_MAZE_SIZE);
-        int width = Math.max(random.nextInt(MAX_MAZE_SIZE), MIN_MAZE_SIZE);
-
-        heightChoiceBox.setValue(height);
-        widthChoiceBox.setValue(width);
-
-        int startRow = random.nextInt(height - 1);
-        int startColumn = random.nextInt(width - 1);
-
-        int endRow = random.nextInt(height - 1);
-        int endColumn = random.nextInt(width - 1);
-
-        while (startRow == endRow && startColumn == endColumn) {
-            endRow = random.nextInt(height - 1);
-            endColumn = random.nextInt(width - 1);
-        }
-
-        mazePane.getChildren().forEach(node -> {
-            if (node instanceof ImageView) {
-                ImageView view = (ImageView) node;
-                if (random.nextBoolean())
-                    view.setImage(Type.WALL.image);
-            }
-        });
-
-        startPoint = (ImageView) mazePane.getChildren().filtered(node ->
-                GridPane.getRowIndex(node) != null && GridPane.getColumnIndex(node) != null
-                        && GridPane.getRowIndex(node) == startRow && GridPane.getColumnIndex(node) == startColumn
-        ).get(0);
-        startPoint.setImage(Type.START.image);
-
-        // Variables to use inside the following lambda.
-        int finalEndRow = endRow;
-        int finalEndColumn = endColumn;
-        endPoint = (ImageView) mazePane.getChildren().filtered(node ->
-                GridPane.getRowIndex(node) != null && GridPane.getColumnIndex(node) != null
-                        && GridPane.getRowIndex(node) == finalEndRow && GridPane.getColumnIndex(node) == finalEndColumn
-        ).get(0);
-        endPoint.setImage(Type.END.image);
-
+        loadMaze(Maze.random());
         statusLabel.setText(strings.getString("randomOk"));
-        checkStartEndSet();
     }
 
     /**
@@ -522,7 +482,8 @@ public class MazeController implements Initializable {
                     strings.getString("resetTitle"),
                     then -> {
                         try {
-                            loadMaze(file);
+                            Maze maze = MazeManager.load(file);
+                            loadMaze(maze);
                             mazeChanged = false;
                             statusLabel.setText(strings.getString("loadOk"));
                         } catch (IOException | IllegalArgumentException e) {
@@ -549,12 +510,10 @@ public class MazeController implements Initializable {
     /**
      * Shows the maze loaded from specified file.
      *
-     * @param file a file containing the maze.
-     * @throws IOException if there are some problems with the file.
+     * @param maze model maze representation.
      */
-    private void loadMaze(File file) throws IOException {
+    private void loadMaze(Maze maze) {
         hideSolution();
-        Maze maze = MazeManager.load(file);
         heightChoiceBox.setValue(maze.getHeight());
         widthChoiceBox.setValue(maze.getWidth());
         for (Cell[] column : maze.getMazeGrid()) {
