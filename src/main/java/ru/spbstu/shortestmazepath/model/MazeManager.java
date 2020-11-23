@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MazeManager {
 
@@ -26,8 +27,10 @@ public class MazeManager {
         Files.write(outputFile.toPath(), lines);
     }
 
-    public static Maze load(File inputFile) throws IOException {
-        List<String> lines = Files.readAllLines(inputFile.toPath());
+    public static Maze load(File inputFile) throws IOException, IllegalArgumentException {
+        List<String> lines = Files.readAllLines(inputFile.toPath()).stream().filter(s -> !s.isBlank()).collect(Collectors.toList());
+        if (lines.size() < 2)
+            throw new IllegalArgumentException("File is not formatted properly");
         String size = lines.get(0);
         lines.remove(0);
         if (!size.matches("\\d+x\\d+"))
