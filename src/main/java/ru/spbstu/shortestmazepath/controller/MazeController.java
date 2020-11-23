@@ -12,10 +12,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import ru.spbstu.shortestmazepath.model.Cell;
 import ru.spbstu.shortestmazepath.model.Maze;
+import ru.spbstu.shortestmazepath.model.MazeManager;
 import ru.spbstu.shortestmazepath.util.StringsSupplier;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -109,14 +113,12 @@ public class MazeController implements Initializable {
 
         heightChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> {
             setMazeHeight(heightChoiceBox.getValue());
-            if (solutionHighlighted)
-                setSolutionOpacity(solution, 1);
+            hideSolution();
             statusLabel.setText(strings.getString("constructing"));
         });
         widthChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> {
             setMazeWidth(widthChoiceBox.getValue());
-            if (solutionHighlighted)
-                setSolutionOpacity(solution, 1);
+            hideSolution();
             statusLabel.setText(strings.getString("constructing"));
         });
 
@@ -287,8 +289,7 @@ public class MazeController implements Initializable {
 
         view.setOnMouseClicked(mouseEvent -> {
             mazeChanged = true;
-            if (solutionHighlighted)
-                setSolutionOpacity(solution, 1);
+            hideSolution();
             if (settingStart || settingEnd) {
                 if (settingStart && view != endPoint) {
                     if (startPoint != null)
@@ -324,16 +325,14 @@ public class MazeController implements Initializable {
 
     public void onStartSet() {
         statusLabel.setText(strings.getString("chooseStart"));
-        if (solutionHighlighted)
-            setSolutionOpacity(solution, 1);
+        hideSolution();
         settingStart = true;
         settingEnd = false;
     }
 
     public void onEndSet() {
         statusLabel.setText(strings.getString("chooseEnd"));
-        if (solutionHighlighted)
-            setSolutionOpacity(solution, 1);
+        hideSolution();
         settingEnd = true;
         settingStart = false;
     }
@@ -393,6 +392,7 @@ public class MazeController implements Initializable {
         startPoint = null;
         endPoint = null;
         checkStartEndSet();
+        hideSolution();
 
         setMazeHeight(INITIAL_MAZE_SIZE);
         setMazeWidth(INITIAL_MAZE_SIZE);
@@ -438,6 +438,94 @@ public class MazeController implements Initializable {
         } catch (IllegalArgumentException e) {
             statusLabel.setText(strings.getString("noPath"));
         }
+    }
+
+    public void onLoad() {
+        Stage stage = (Stage) mazePane.getScene().getWindow();
+        File file = prepareFileChooser().showOpenDialog(stage);
+        if (file != null) {
+            if (mazeChanged) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle(strings.getString("resetTitle"));
+                alert.setHeaderText(null);
+                alert.setContentText(strings.getString("resetMessage"));
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isEmpty() || result.get() != ButtonType.OK) {
+                    return;
+                }
+            }
+            try {
+                loadMaze(file);
+                mazeChanged = false;
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle(strings.getString("error"));
+                alert.setHeaderText(null);
+                alert.setContentText(e.getMessage());
+            }
+        }
+    }
+
+    public void onSave() {
+        Stage stage = (Stage) mazePane.getScene().getWindow();
+        File file = prepareFileChooser().showSaveDialog(stage);
+        if (file != null) {
+            try {
+                MazeManager.save(mazeViewToModel(), file);
+                mazeChanged = false;
+                statusLabel.setText(strings.getString("saveOk"));
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle(strings.getString("error"));
+                alert.setHeaderText(null);
+                alert.setContentText(e.getMessage());
+            }
+        }
+    }
+
+    private FileChooser prepareFileChooser() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Select file...");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Maze files", "*.maze"),
+                new FileChooser.ExtensionFilter("All files", "*.*")
+        );
+        return chooser;
+    }
+
+    private void hideSolution() {
+        if (solutionHighlighted)
+            setSolutionOpacity(solution, 1);
+    }
+
+    private void loadMaze(File file) throws IOException {
+        hideSolution();
+        Maze maze = MazeManager.load(file);
+        heightChoiceBox.setValue(maze.getHeight());
+        widthChoiceBox.setValue(maze.getWidth());
+        for (Cell[] column : maze.getMazeGrid()) {
+            for (Cell cell : column) {
+                Image img = Type.valueOf(cell.type.name()).image;
+                List<ImageView> l = mazePane.getChildren().stream()
+                        .filter(node -> node instanceof ImageView &&
+                                GridPane.getColumnIndex(node) == cell.x && GridPane.getRowIndex(node) == cell.y)
+                        .map(node -> (ImageView) node)
+                        .collect(Collectors.toList());
+                if (l.size() > 1)
+                    throw new IllegalStateException("Something went wrong: more than one cell for actually one point on field");
+                ImageView imageView = l.get(0);
+                imageView.setImage(img);
+                if (cell.type == Cell.Type.START) {
+                    startPoint = imageView;
+                } else if (cell.type == Cell.Type.END) {
+                    endPoint = imageView;
+                }
+            }
+            statusLabel.setText(strings.getString("loadOk"));
+        }
+        checkStartEndSet();
+        mazeChanged = false;
     }
 
     public void onExit() {
