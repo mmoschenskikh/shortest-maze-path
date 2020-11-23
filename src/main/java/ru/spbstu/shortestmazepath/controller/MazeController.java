@@ -472,6 +472,48 @@ public class MazeController implements Initializable {
         }
     }
 
+    /**
+     * Darkens the solution cells if they are highlighted.
+     */
+    private void hideSolution() {
+        if (solutionHighlighted)
+            setSolutionOpacity(solution, 1);
+    }
+
+    /**
+     * Changes the opacity for solution cells.
+     *
+     * @param solution list of cells to be changed.
+     * @param opacity  opacity value to be set.
+     */
+    private void setSolutionOpacity(List<Cell> solution, double opacity) {
+        for (Cell cell : solution) {
+            mazePane.getChildren().stream()
+                    .filter(node ->
+                            GridPane.getColumnIndex(node) == cell.x && GridPane.getRowIndex(node) == cell.y
+                                    && node instanceof ImageView && !node.equals(startPoint) && !node.equals(endPoint)
+                    )
+                    .map(node -> (ImageView) node)
+                    .collect(Collectors.toList()).forEach(view -> view.setOpacity(opacity));
+        }
+        solutionHighlighted = opacity == SOLUTION_OPACITY;
+    }
+
+    /**
+     * Preparing the window for choosing maze files (.maze).
+     *
+     * @return FileChooser instance
+     */
+    private FileChooser prepareFileChooser() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Select file...");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Maze files", "*.maze"),
+                new FileChooser.ExtensionFilter("All files", "*.*")
+        );
+        return chooser;
+    }
+
     public void onLoad() {
         Stage stage = (Stage) mazePane.getScene().getWindow();
         File file = prepareFileChooser().showOpenDialog(stage);
@@ -504,29 +546,12 @@ public class MazeController implements Initializable {
         }
     }
 
-    private void showErrorMessage(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(strings.getString("error"));
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.show();
-    }
-
-    private FileChooser prepareFileChooser() {
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Select file...");
-        chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Maze files", "*.maze"),
-                new FileChooser.ExtensionFilter("All files", "*.*")
-        );
-        return chooser;
-    }
-
-    private void hideSolution() {
-        if (solutionHighlighted)
-            setSolutionOpacity(solution, 1);
-    }
-
+    /**
+     * Shows the maze loaded from specified file.
+     *
+     * @param file a file containing the maze.
+     * @throws IOException if there are some problems with the file.
+     */
     private void loadMaze(File file) throws IOException {
         hideSolution();
         Maze maze = MazeManager.load(file);
@@ -550,41 +575,15 @@ public class MazeController implements Initializable {
                     endPoint = imageView;
                 }
             }
-            statusLabel.setText(strings.getString("loadOk"));
         }
         checkStartEndSet();
-        mazeChanged = false;
     }
 
-    public void onExit() {
-        if (mazeChanged) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle(strings.getString("exitTitle"));
-            alert.setHeaderText(null);
-            alert.setContentText(strings.getString("resetMessage"));
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isEmpty() || result.get() != ButtonType.OK) {
-                return;
-            }
-        }
-        Platform.exit();
-        System.exit(0);
-    }
-
-    private void setSolutionOpacity(List<Cell> solution, double opacity) {
-        for (Cell cell : solution) {
-            mazePane.getChildren().stream()
-                    .filter(node ->
-                            GridPane.getColumnIndex(node) == cell.x && GridPane.getRowIndex(node) == cell.y
-                                    && node instanceof ImageView && !node.equals(startPoint) && !node.equals(endPoint)
-                    )
-                    .map(node -> (ImageView) node)
-                    .collect(Collectors.toList()).forEach(view -> view.setOpacity(opacity));
-        }
-        solutionHighlighted = opacity == SOLUTION_OPACITY;
-    }
-
+    /**
+     * Converts view maze representation to model Maze class.
+     *
+     * @return an instance of Maze class that represents the maze currently on the screen.
+     */
     private Maze mazeViewToModel() {
         final int height = heightChoiceBox.getValue();
         final int width = widthChoiceBox.getValue();
