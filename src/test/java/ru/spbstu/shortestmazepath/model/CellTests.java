@@ -2,7 +2,9 @@ package ru.spbstu.shortestmazepath.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static ru.spbstu.shortestmazepath.util.TestUtils.assertApproxEquals;
 
 public class CellTests {
 
@@ -27,13 +29,5 @@ public class CellTests {
         assertApproxEquals(c2.distanceTo(c1), c1.distanceTo(c2), 1e-7);
         assertApproxEquals(1, c1.distanceTo(c2), 1e-7);
         assertApproxEquals(Math.sqrt(2), c1.distanceTo(c3), 1e-7);
-    }
-
-    private static boolean approxEquals(double expected, double actual, double delta) {
-        return Math.abs(expected - actual) <= delta;
-    }
-
-    private static void assertApproxEquals(double expected, double actual, double delta) {
-        assertTrue(approxEquals(expected, actual, delta));
     }
 }
