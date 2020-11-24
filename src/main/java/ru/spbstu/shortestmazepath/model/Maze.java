@@ -37,6 +37,30 @@ public class Maze {
         return startCell;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Maze maze = (Maze) o;
+
+        if (height != maze.height) return false;
+        if (width != maze.width) return false;
+        if (!Objects.equals(startCell, maze.startCell)) return false;
+        if (!Objects.equals(endCell, maze.endCell)) return false;
+        return Arrays.deepEquals(mazeGrid, maze.mazeGrid);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = height;
+        result = 31 * result + width;
+        result = 31 * result + (startCell != null ? startCell.hashCode() : 0);
+        result = 31 * result + (endCell != null ? endCell.hashCode() : 0);
+        result = 31 * result + Arrays.deepHashCode(mazeGrid);
+        return result;
+    }
+
     public Cell getEndCell() {
         return endCell;
     }
