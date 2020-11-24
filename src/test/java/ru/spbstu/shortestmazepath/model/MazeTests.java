@@ -2,12 +2,13 @@ package ru.spbstu.shortestmazepath.model;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static ru.spbstu.shortestmazepath.util.TestUtils.assertApproxEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static ru.spbstu.shortestmazepath.TestUtils.assertApproxEquals;
 
 public class MazeTests {
 
@@ -61,6 +62,16 @@ public class MazeTests {
     }
 
     @Test
+    public void equalsTest() {
+        Maze m1 = Maze.random();
+        Maze m2 = Maze.random();
+
+        assertEquals(m1, m1);
+        if (!m1.getStartCell().equals(m2.getStartCell()))
+            assertNotEquals(m1, m2);
+    }
+
+    @Test
     public void simpleSolveTest() {
         Cell[][] cells = new Cell[2][2];
         cells[0][0] = new Cell(0, 0, Cell.Type.START);
@@ -77,5 +88,17 @@ public class MazeTests {
         assertEquals(3, maze2.solve().size());
         // (0, 1) because it firstly checks the right neighbour
         assertIterableEquals(Arrays.asList(cells[0][0], cells[0][1], cells[1][1]), maze2.solve());
+    }
+
+    @Test
+    public void solveTests() throws IOException {
+        Maze m1 = MazeManager.load(new File("examples/sample1.maze"));
+        assertEquals(39, m1.solve().size());
+
+        Maze m2 = MazeManager.load(new File("examples/sample2.maze"));
+        assertEquals(53, m2.solve().size());
+
+        Maze m3 = MazeManager.load(new File("examples/sample3.maze"));
+        assertEquals(38, m3.solve().size());
     }
 }
