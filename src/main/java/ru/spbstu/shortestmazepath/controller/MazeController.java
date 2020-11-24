@@ -488,6 +488,7 @@ public class MazeController implements Initializable {
                             statusLabel.setText(strings.getString("loadOk"));
                         } catch (IOException | IllegalArgumentException e) {
                             showErrorMessage(e.getMessage());
+                            statusLabel.setText(strings.getString("loadFail"));
                         }
                     });
         }
@@ -503,6 +504,7 @@ public class MazeController implements Initializable {
                 statusLabel.setText(strings.getString("saveOk"));
             } catch (IOException e) {
                 showErrorMessage(e.getMessage());
+                statusLabel.setText(strings.getString("saveFail"));
             }
         }
     }

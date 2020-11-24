@@ -13,6 +13,8 @@ resetOk=Successfully reset
 error=An error occurred
 loadOk=Maze successfully loaded
 saveOk=Maze successfully saved
+loadFail=Maze loading failed
+saveFail=Maze saving failed
 
 solved=Successfully solved in %d ms
 noPath=No path found in the Maze
