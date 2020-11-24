@@ -342,8 +342,11 @@ public class MazeController implements Initializable {
     }
 
     public void onRandom() {
-        loadMaze(Maze.random());
-        statusLabel.setText(strings.getString("randomOk"));
+        showResetConfirmation(strings.getString("resetTitle"), then -> {
+            loadMaze(Maze.random());
+            mazeChanged = false;
+            statusLabel.setText(strings.getString("randomOk"));
+        });
     }
 
     /**
