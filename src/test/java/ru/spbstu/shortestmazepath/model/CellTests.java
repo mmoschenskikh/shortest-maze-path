@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static ru.spbstu.shortestmazepath.util.TestUtils.assertApproxEquals;
+import static ru.spbstu.shortestmazepath.TestUtils.assertApproxEquals;
 
 public class CellTests {
 

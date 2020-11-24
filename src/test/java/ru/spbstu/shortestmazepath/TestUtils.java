@@ -1,4 +1,4 @@
-package ru.spbstu.shortestmazepath.util;
+package ru.spbstu.shortestmazepath;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
